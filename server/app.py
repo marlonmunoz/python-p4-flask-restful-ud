@@ -79,8 +79,45 @@ class NewsletterByID(Resource):
         )
 
         return response
+    
+    def patch(self, id):                                               #  Define the patch method
+        
+        record = Newsletter.query.filter(Newsletter.id == id).first()  #  Query the database for the record
+        for attr in request.form:                                      #  Iterate through the form data
+            setattr(record, attr, request.form[attr])                  #  Update the record with the new data
+        
+        db.session.add(record)                                         #  Add the record to the session
+        db.session.commit()                                            #  Commit the changes to the database
 
-api.add_resource(NewsletterByID, '/newsletters/<int:id>')
+        response_dict = record.to_dict()                               #  Convert the record to a dictionary
+        
+        response = make_response(                                      #  Create a response
+            response_dict,                                             #  Pass the dictionary as the response data
+            200,                                                       #  Set the status code to 200
+        )
+
+        return response                                                #  Return the response
+    
+
+
+
+    def delete(self, id):                                              #  Define the delete method  
+
+        record = Newsletter.query.filter(Newsletter.id == id).first()  #  Query the database for the record
+
+        db.session.detete(record)                                      #  Delete the record from the database
+        db.session.commit()                                            #  Commit the changes to the database
+ 
+        response_dict = {'message': 'record successfully deleted'}     #  Create a response dictionary
+ 
+        response = make_response(                                      #  Create a response
+            response_dict,                                             #  Pass the dictionary as the response data
+            200,                                                       #  Set the status code to 200
+        ) 
+ 
+        return response                                                #  Return the response
+ 
+api.add_resource(NewsletterByID, '/newsletters/<int:id>')              #  Add the resource to the API
 
 
 if __name__ == '__main__':
